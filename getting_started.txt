@@ -1,0 +1,9 @@
+After cloning repository, need to set up a few more things
+
+Sign into spotify account 
+Set spotify credentials 
+Find email login parameters 
+Ensure run_notebook folder exists 
+
+
+Set up AWS backup 
