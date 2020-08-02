@@ -11,3 +11,6 @@ So we use spotify's API to save recently listened history to sqlite database. We
 Once the data is captured, we can do analysis later on by tracking popular artists, genre trends, and potential lyrical trends. 
 This is repository simply allows for the tracking of the spotify data. 
 
+The listening_history.db file is an example of the output.
+
+
