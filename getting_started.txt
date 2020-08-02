@@ -1,9 +1,11 @@
 After cloning repository, need to set up a few more things
 
-Sign into spotify account 
-Set spotify credentials 
-Find email login parameters 
-Ensure run_notebook folder exists 
+1. Set spotify environment variables -- client id, secret key, redirect uri  to data/credentials.pkl
+2. Sign into spotify account to set up cache files (may be able to use the demo oauth work flow .py) 
+3. Find email login parameters for the email notifications -- data/email_pw.pkl 
+4. Set up cron job 
+-- crontab -e 
+-- 10 */2 * * * bash /home/pi/../run_notebook.sh >> home/pi/../run_notebook.log 2>&1
 
+5. Set up AWS DB backup 
 
-Set up AWS backup 
