@@ -1,11 +1,17 @@
 After cloning repository, need to set up a few more things
 
-1. Set spotify environment variables -- client id, secret key, redirect uri  to data/credentials.pkl
-2. Sign into spotify account to set up cache files (may be able to use the demo oauth work flow .py) 
-3. Find email login parameters for the email notifications -- data/email_pw.pkl 
+1. Set spotify environment variables -- client id, secret key, redirect uri to data/spotify_credentials.pkl
+2. Find email login parameters for the email notifications -- data/email_pw.pkl 
+    -- can use config helper to set the ids and passwords 
+3. Sign into spotify account to set up cache files 
+    - for now, you must run the get_latest_prod notebook on the server must be run on server to go through auth workflow 
+    - it will prompt you to log into your spotify account using a webpage, after logging in, you must enter that url into the notebook cell 
+    - Use vnc to ssh start the jupyter notebook because it will auto open the auth workflow 
+    - also a good time to change the user from "malchemist" to your spotify user name 
+    - you only have to do this infrequently (until token expires) 
 4. Set up cron job 
 -- crontab -e 
--- 10 */2 * * * bash /home/pi/../run_notebook.sh >> home/pi/../run_notebook.log 2>&1
+# 10 */2 * * * bash /home/pi/Loggers/Spotify_Logger/run_notebook.sh > /tmp/spotify_logger.log 2>&1
 
 5. Set up AWS DB backup 
 
