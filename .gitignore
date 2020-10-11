@@ -4,3 +4,4 @@ data
 .ipynb*
 .flask*
 run_notebooks/
+run_logs
