@@ -31,5 +31,4 @@ deactivate
 exit 0
 
 # crontab -e
-# 10 10 * * Sun bash scripts/run_email_notebooks.sh >> /home/pi/Loggers/Spotify_Logger/run_logs/run_email_notebook.log 2>&1
-
+# 10 10 * * Sun bash /home/pi/Loggers/Spotify_Logger/run_email_notebook.sh >> /home/pi/Loggers/Spotify_Logger/run_logs/run_email_notebook.log 2>&1
