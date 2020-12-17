@@ -8,10 +8,7 @@ RN_FILENAME=Weekly_Analysis_${DATE}.ipynb
 LOCATION=run_notebooks/
 RN_FILEPATH=$LOCATION$RN_FILENAME
 
-# Generic venv because requirements are minimal
-source /home/pi/venv/bin/activate
-
-
+source /home/malcolm/main/bin/activate
 echo "Will be saving new notebook to: "$RN_FILEPATH
 papermill Weekly_Analysis.ipynb $RN_FILEPATH
 
@@ -25,10 +22,7 @@ then
   rm $RN_FILEPATH
 fi
 
-
-
-deactivate
 exit 0
 
 # crontab -e
-# 10 10 * * Sun bash /home/pi/Loggers/Spotify_Logger/run_email_notebook.sh >> /home/pi/Loggers/Spotify_Logger/run_logs/run_email_notebook.log 2>&1
+# 30 8 * * Sun bash /home/malcolm/Spotify_Logger/run_email_notebook.sh >> /home/pi/Spotify_Logger/run_logs/run_email_notebook.log 2>&1
