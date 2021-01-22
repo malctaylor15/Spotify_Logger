@@ -1,0 +1,13 @@
+current working directory: /home/malcolm/Spotify_Logger
+Will be saving new notebook to: run_notebooks/Run_Notebooks_01-22-2021.ipynb
+Input Notebook:  Run_Notebooks.ipynb
+Output Notebook: run_notebooks/Run_Notebooks_01-22-2021.ipynb
+Generating grammar tables from /home/malcolm/main/lib/python3.6/site-packages/blib2to3/Grammar.txt
+Writing grammar tables to /home/malcolm/.cache/black/20.8b1/Grammar3.6.9.final.0.pickle
+Writing failed: [Errno 2] No such file or directory: '/home/malcolm/.cache/black/20.8b1/tmpwu2y0ogo'
+Generating grammar tables from /home/malcolm/main/lib/python3.6/site-packages/blib2to3/PatternGrammar.txt
+Writing grammar tables to /home/malcolm/.cache/black/20.8b1/PatternGrammar3.6.9.final.0.pickle
+Writing failed: [Errno 2] No such file or directory: '/home/malcolm/.cache/black/20.8b1/tmpxm92856d'
+Executing:   0%|          | 0/21 [00:00<?, ?cell/s]Executing notebook with kernel: python3
+Executing:   5%|▍         | 1/21 [00:02<00:42,  2.14s/cell]Executing:  19%|█▉        | 4/21 [00:02<00:25,  1.51s/cell]Executing:  33%|███▎      | 7/21 [00:02<00:14,  1.07s/cell]Executing:  48%|████▊     | 10/21 [00:08<00:15,  1.40s/cell]Executing:  62%|██████▏   | 13/21 [00:09<00:07,  1.01cell/s]Executing:  71%|███████▏  | 15/21 [00:09<00:04,  1.41cell/s]Executing:  86%|████████▌ | 18/21 [00:09<00:01,  1.96cell/s]Executing: 100%|██████████| 21/21 [00:09<00:00,  2.69cell/s]Executing: 100%|██████████| 21/21 [00:09<00:00,  2.12cell/s]
+removing run_notebooks/Run_Notebooks_01-22-2021.ipynb
