@@ -9,7 +9,7 @@ LOCATION=run_notebooks/
 RN_FILEPATH=$LOCATION$RN_FILENAME
 
 # Generic venv because requirements are minimal
-source /home/pi/venv/bin/activate
+source /home/malcolm/main/bin/activate
 
 
 echo "Will be saving new notebook to: "$RN_FILEPATH
@@ -25,8 +25,6 @@ then
 fi
 
 
-
-deactivate
 exit 0
 
 # crontab -e
