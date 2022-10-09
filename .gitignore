@@ -6,3 +6,4 @@ data
 run_notebooks/
 run_logs
 images
+*.log

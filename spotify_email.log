@@ -1,7 +1,69 @@
 current working directory: /home/malcolm/Spotify_Logger
-Will be saving new notebook to: run_notebooks/Weekly_Analysis_12-26-2021.ipynb
+Will be saving new notebook to: run_notebooks/Weekly_Analysis_01-30-2022.ipynb
 Input Notebook:  Weekly_Analysis.ipynb
-Output Notebook: run_notebooks/Weekly_Analysis_12-26-2021.ipynb
-Executing:   0%|          | 0/73 [00:00<?, ?cell/s]Executing notebook with kernel: python3
-Executing:   1%|▏         | 1/73 [00:07<09:08,  7.62s/cell]Executing:   3%|▎         | 2/73 [00:07<06:21,  5.37s/cell]Executing:   4%|▍         | 3/73 [00:07<04:27,  3.82s/cell]Executing:   5%|▌         | 4/73 [00:08<03:06,  2.71s/cell]Executing:   7%|▋         | 5/73 [00:08<02:11,  1.94s/cell]Executing:   8%|▊         | 6/73 [00:08<01:34,  1.42s/cell]Executing:  10%|▉         | 7/73 [00:08<01:08,  1.03s/cell]Executing:  11%|█         | 8/73 [00:08<00:55,  1.16cell/s]Executing:  12%|█▏        | 9/73 [00:09<00:41,  1.52cell/s]Executing:  14%|█▎        | 10/73 [00:09<00:31,  2.00cell/s]Executing:  15%|█▌        | 11/73 [00:09<00:24,  2.55cell/s]Executing:  16%|█▋        | 12/73 [00:09<00:20,  2.94cell/s]Executing:  18%|█▊        | 13/73 [00:09<00:17,  3.50cell/s]Executing:  19%|█▉        | 14/73 [00:09<00:14,  4.05cell/s]Executing:  21%|██        | 15/73 [00:10<00:15,  3.80cell/s]Executing:  22%|██▏       | 16/73 [00:10<00:14,  4.03cell/s]Executing:  23%|██▎       | 17/73 [00:10<00:13,  4.19cell/s]Executing:  25%|██▍       | 18/73 [00:10<00:12,  4.58cell/s]Executing:  26%|██▌       | 19/73 [00:11<00:10,  5.31cell/s]Executing:  27%|██▋       | 20/73 [00:11<00:09,  5.81cell/s]Executing:  29%|██▉       | 21/73 [00:11<00:10,  4.93cell/s]Executing:  30%|███       | 22/73 [00:11<00:11,  4.58cell/s]Executing:  32%|███▏      | 23/73 [00:11<00:11,  4.19cell/s]Executing:  33%|███▎      | 24/73 [00:12<00:11,  4.33cell/s]Executing:  34%|███▍      | 25/73 [00:12<00:10,  4.63cell/s]Executing:  36%|███▌      | 26/73 [00:12<00:10,  4.62cell/s]Executing:  37%|███▋      | 27/73 [00:12<00:09,  4.85cell/s]Executing:  38%|███▊      | 28/73 [00:12<00:08,  5.26cell/s]Executing:  40%|███▉      | 29/73 [00:16<00:56,  1.28s/cell]Executing:  41%|████      | 30/73 [00:17<00:46,  1.08s/cell]Executing:  42%|████▏     | 31/73 [00:17<00:36,  1.16cell/s]Executing:  44%|████▍     | 32/73 [00:18<00:30,  1.35cell/s]Executing:  45%|████▌     | 33/73 [00:18<00:25,  1.59cell/s]Executing:  47%|████▋     | 34/73 [00:18<00:22,  1.72cell/s]Executing:  48%|████▊     | 35/73 [00:19<00:21,  1.79cell/s]Executing:  49%|████▉     | 36/73 [00:19<00:18,  1.98cell/s]Executing:  51%|█████     | 37/73 [00:22<00:46,  1.29s/cell]Executing:  52%|█████▏    | 38/73 [00:23<00:36,  1.04s/cell]Executing:  53%|█████▎    | 39/73 [00:24<00:30,  1.11cell/s]Executing:  55%|█████▍    | 40/73 [00:24<00:25,  1.29cell/s]Executing:  56%|█████▌    | 41/73 [00:24<00:21,  1.48cell/s]Executing:  58%|█████▊    | 42/73 [00:25<00:20,  1.51cell/s]Executing:  59%|█████▉    | 43/73 [00:26<00:17,  1.69cell/s]Executing:  60%|██████    | 44/73 [00:26<00:17,  1.63cell/s]Executing:  62%|██████▏   | 45/73 [00:27<00:16,  1.72cell/s]Executing:  63%|██████▎   | 46/73 [00:27<00:14,  1.81cell/s]Executing:  64%|██████▍   | 47/73 [00:28<00:14,  1.85cell/s]Executing:  66%|██████▌   | 48/73 [00:28<00:12,  1.97cell/s]Executing:  67%|██████▋   | 49/73 [00:29<00:12,  1.92cell/s]Executing:  68%|██████▊   | 50/73 [00:29<00:11,  2.04cell/s]Executing:  70%|██████▉   | 51/73 [00:30<00:10,  2.05cell/s]Executing:  71%|███████   | 52/73 [00:30<00:09,  2.21cell/s]Executing:  73%|███████▎  | 53/73 [00:30<00:08,  2.30cell/s]Executing:  74%|███████▍  | 54/73 [00:31<00:08,  2.20cell/s]Executing:  75%|███████▌  | 55/73 [00:31<00:07,  2.30cell/s]Executing:  77%|███████▋  | 56/73 [00:32<00:10,  1.55cell/s]Executing:  78%|███████▊  | 57/73 [00:33<00:10,  1.49cell/s]Executing:  79%|███████▉  | 58/73 [00:34<00:08,  1.68cell/s]Executing:  81%|████████  | 59/73 [00:34<00:07,  1.83cell/s]Executing:  82%|████████▏ | 60/73 [00:34<00:06,  1.93cell/s]Executing:  84%|████████▎ | 61/73 [00:35<00:05,  2.09cell/s]Executing:  85%|████████▍ | 62/73 [00:35<00:05,  2.15cell/s]Executing:  86%|████████▋ | 63/73 [00:36<00:05,  1.85cell/s]Executing:  88%|████████▊ | 64/73 [00:36<00:04,  1.95cell/s]Executing:  89%|████████▉ | 65/73 [00:37<00:04,  1.87cell/s]Executing:  90%|█████████ | 66/73 [00:40<00:09,  1.34s/cell]Executing:  92%|█████████▏| 67/73 [00:41<00:06,  1.10s/cell]Executing:  93%|█████████▎| 68/73 [00:41<00:04,  1.10cell/s]Executing:  95%|█████████▍| 69/73 [00:42<00:04,  1.01s/cell]Executing:  96%|█████████▌| 70/73 [00:43<00:02,  1.08cell/s]Executing:  97%|█████████▋| 71/73 [00:45<00:02,  1.33s/cell]Executing:  99%|█████████▊| 72/73 [00:46<00:01,  1.05s/cell]Executing: 100%|██████████| 73/73 [00:46<00:00,  1.17cell/s]Executing: 100%|██████████| 73/73 [00:48<00:00,  1.51cell/s]
-removing run_notebooks/Weekly_Analysis_12-26-2021.ipynb
+Output Notebook: run_notebooks/Weekly_Analysis_01-30-2022.ipynb
+Executing:   0%|          | 0/87 [00:00<?, ?cell/s]Executing notebook with kernel: python3
+Executing:   1%|          | 1/87 [00:08<12:07,  8.46s/cell]Executing:   2%|▏         | 2/87 [00:08<08:27,  5.98s/cell]Executing:   3%|▎         | 3/87 [00:08<06:00,  4.29s/cell]Executing:   5%|▍         | 4/87 [00:09<04:13,  3.06s/cell]Executing:   6%|▌         | 5/87 [00:09<02:59,  2.19s/cell]Executing:   7%|▋         | 6/87 [00:09<02:09,  1.60s/cell]Executing:   8%|▊         | 7/87 [00:09<01:34,  1.18s/cell]Executing:   9%|▉         | 8/87 [00:10<01:19,  1.00s/cell]Executing:  10%|█         | 9/87 [00:10<01:01,  1.27cell/s]Executing:  11%|█▏        | 10/87 [00:10<00:47,  1.62cell/s]Executing:  13%|█▎        | 11/87 [00:11<00:37,  2.05cell/s]Executing:  14%|█▍        | 12/87 [00:11<00:31,  2.38cell/s]Executing:  15%|█▍        | 13/87 [00:11<00:27,  2.65cell/s]Executing:  16%|█▌        | 14/87 [00:11<00:25,  2.82cell/s]Executing:  17%|█▋        | 15/87 [00:12<00:25,  2.79cell/s]Executing:  18%|█▊        | 16/87 [00:12<00:24,  2.94cell/s]Executing:  20%|█▉        | 17/87 [00:12<00:20,  3.42cell/s]Executing:  21%|██        | 18/87 [00:12<00:17,  3.84cell/s]Executing:  22%|██▏       | 19/87 [00:13<00:17,  3.99cell/s]Executing:  23%|██▎       | 20/87 [00:13<00:15,  4.19cell/s]Executing:  24%|██▍       | 21/87 [00:13<00:18,  3.61cell/s]Executing:  25%|██▌       | 22/87 [00:14<00:18,  3.51cell/s]Executing:  26%|██▋       | 23/87 [00:14<00:17,  3.62cell/s]Executing:  28%|██▊       | 24/87 [00:14<00:15,  3.97cell/s]Executing:  29%|██▊       | 25/87 [00:14<00:14,  4.23cell/s]Executing:  30%|██▉       | 26/87 [00:15<00:16,  3.64cell/s]Executing:  31%|███       | 27/87 [00:15<00:15,  3.78cell/s]Executing:  32%|███▏      | 28/87 [00:15<00:14,  4.05cell/s]Executing:  33%|███▎      | 29/87 [00:19<01:27,  1.51s/cell]Executing:  34%|███▍      | 30/87 [00:20<01:09,  1.23s/cell]Executing:  36%|███▌      | 31/87 [00:21<01:00,  1.09s/cell]Executing:  37%|███▋      | 32/87 [00:21<00:49,  1.11cell/s]Executing:  38%|███▊      | 33/87 [00:22<00:41,  1.31cell/s]Executing:  39%|███▉      | 34/87 [00:22<00:37,  1.43cell/s]Executing:  40%|████      | 35/87 [00:23<00:32,  1.62cell/s]Executing:  41%|████▏     | 36/87 [00:23<00:29,  1.71cell/s]Executing:  43%|████▎     | 37/87 [00:26<00:59,  1.19s/cell]Executing:  44%|████▎     | 38/87 [00:26<00:47,  1.04cell/s]Executing:  45%|████▍     | 39/87 [00:27<00:38,  1.25cell/s]Executing:  46%|████▌     | 40/87 [00:27<00:34,  1.37cell/s]Executing:  47%|████▋     | 41/87 [00:28<00:29,  1.53cell/s]Executing:  48%|████▊     | 42/87 [00:28<00:28,  1.58cell/s]Executing:  49%|████▉     | 43/87 [00:29<00:26,  1.64cell/s]Executing:  51%|█████     | 44/87 [00:29<00:26,  1.63cell/s]Executing:  52%|█████▏    | 45/87 [00:30<00:25,  1.62cell/s]Executing:  53%|█████▎    | 46/87 [00:31<00:27,  1.50cell/s]Executing:  54%|█████▍    | 47/87 [00:31<00:24,  1.63cell/s]Executing:  55%|█████▌    | 48/87 [00:32<00:22,  1.71cell/s]Executing:  56%|█████▋    | 49/87 [00:32<00:21,  1.74cell/s]Executing:  57%|█████▋    | 50/87 [00:33<00:20,  1.77cell/s]Executing:  59%|█████▊    | 51/87 [00:33<00:18,  1.90cell/s]Executing:  60%|█████▉    | 52/87 [00:34<00:21,  1.61cell/s]Executing:  61%|██████    | 53/87 [00:35<00:20,  1.69cell/s]Executing:  62%|██████▏   | 54/87 [00:35<00:18,  1.75cell/s]Executing:  63%|██████▎   | 55/87 [00:39<00:47,  1.48s/cell]Executing:  63%|██████▎   | 55/87 [00:41<00:24,  1.33cell/s]
+Traceback (most recent call last):
+  File "/home/malcolm/main/bin/papermill", line 8, in <module>
+    sys.exit(papermill())
+  File "/home/malcolm/main/lib/python3.6/site-packages/click/core.py", line 829, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/malcolm/main/lib/python3.6/site-packages/click/core.py", line 782, in main
+    rv = self.invoke(ctx)
+  File "/home/malcolm/main/lib/python3.6/site-packages/click/core.py", line 1066, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/malcolm/main/lib/python3.6/site-packages/click/core.py", line 610, in invoke
+    return callback(*args, **kwargs)
+  File "/home/malcolm/main/lib/python3.6/site-packages/click/decorators.py", line 21, in new_func
+    return f(get_current_context(), *args, **kwargs)
+  File "/home/malcolm/main/lib/python3.6/site-packages/papermill/cli.py", line 256, in papermill
+    execution_timeout=execution_timeout,
+  File "/home/malcolm/main/lib/python3.6/site-packages/papermill/execute.py", line 110, in execute_notebook
+    raise_for_execution_errors(nb, output_path)
+  File "/home/malcolm/main/lib/python3.6/site-packages/papermill/execute.py", line 222, in raise_for_execution_errors
+    raise error
+papermill.exceptions.PapermillExecutionError: 
+---------------------------------------------------------------------------
+Exception encountered at "In [42]":
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-42-335fcde1e2fc> in <module>
+      1 source_details = pd.Series(playlist_hist['playlist_id'].dropna())\
+----> 2     .apply(lambda x:parse_source_uri(spotify, x))
+      3 all_playlist_info = pd.merge(playlist_hist, source_details
+      4                              , left_on='playlist_id', right_on='uri', how='outer')
+      5 all_playlist_info = all_playlist_info.sort_values('Mins Listened', ascending=False)
+
+~/main/lib/python3.6/site-packages/pandas/core/series.py in apply(self, func, convert_dtype, args, **kwds)
+   4210             else:
+   4211                 values = self.astype(object)._values
+-> 4212                 mapped = lib.map_infer(values, f, convert=convert_dtype)
+   4213 
+   4214         if len(mapped) and isinstance(mapped[0], Series):
+
+pandas/_libs/lib.pyx in pandas._libs.lib.map_infer()
+
+<ipython-input-42-335fcde1e2fc> in <lambda>(x)
+      1 source_details = pd.Series(playlist_hist['playlist_id'].dropna())\
+----> 2     .apply(lambda x:parse_source_uri(spotify, x))
+      3 all_playlist_info = pd.merge(playlist_hist, source_details
+      4                              , left_on='playlist_id', right_on='uri', how='outer')
+      5 all_playlist_info = all_playlist_info.sort_values('Mins Listened', ascending=False)
+
+<ipython-input-38-aaf00e344626> in parse_source_uri(spotify, uri)
+      4         details = parse_playlist_details(spotify, split_uri[2])
+      5     elif split_uri[1] == 'album':
+----> 6         details = parse_album_details(spotify, split_uri[2])
+      7     elif split_uri[1] == 'artist':
+      8         details = parse_artist_details(spotify, split_uri[2])
+
+<ipython-input-36-72f254d7b7e5> in parse_album_details(spotify, album_id)
+      4     num_artists = len(album_call['artists'])
+      5     artist_part = album_call['artists'][0]['name'] if num_artists == 1\
+----> 6         else album_call['artists'][0] + f' - {num_artists} artists'
+      7     out['Name'] = album_call['name'] + ' - '+ artist_part
+      8     out['Num Tracks'] = album_call['total_tracks']
+
+TypeError: unsupported operand type(s) for +: 'dict' and 'str'
+

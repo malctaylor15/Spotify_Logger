@@ -1,13 +1,13 @@
 current working directory: /home/malcolm/Spotify_Logger
-Will be saving new notebook to: run_notebooks/Run_Notebooks_12-29-2021.ipynb
+Will be saving new notebook to: run_notebooks/Run_Notebooks_02-05-2022.ipynb
 Input Notebook:  Run_Notebooks.ipynb
-Output Notebook: run_notebooks/Run_Notebooks_12-29-2021.ipynb
+Output Notebook: run_notebooks/Run_Notebooks_02-05-2022.ipynb
 Generating grammar tables from /home/malcolm/main/lib/python3.6/site-packages/blib2to3/Grammar.txt
 Writing grammar tables to /home/malcolm/.cache/black/20.8b1/Grammar3.6.9.final.0.pickle
-Writing failed: [Errno 2] No such file or directory: '/home/malcolm/.cache/black/20.8b1/tmpelfey4ds'
+Writing failed: [Errno 2] No such file or directory: '/home/malcolm/.cache/black/20.8b1/tmpqgda44r3'
 Generating grammar tables from /home/malcolm/main/lib/python3.6/site-packages/blib2to3/PatternGrammar.txt
 Writing grammar tables to /home/malcolm/.cache/black/20.8b1/PatternGrammar3.6.9.final.0.pickle
-Writing failed: [Errno 2] No such file or directory: '/home/malcolm/.cache/black/20.8b1/tmpbn_ni_s0'
+Writing failed: [Errno 2] No such file or directory: '/home/malcolm/.cache/black/20.8b1/tmphbehg9_f'
 Executing:   0%|          | 0/21 [00:00<?, ?cell/s]Executing notebook with kernel: python3
-Executing:   5%|▍         | 1/21 [00:04<01:20,  4.00s/cell]Executing:  14%|█▍        | 3/21 [00:04<00:50,  2.82s/cell]Executing:  24%|██▍       | 5/21 [00:04<00:31,  2.00s/cell]Executing:  33%|███▎      | 7/21 [00:04<00:19,  1.41s/cell]Executing:  43%|████▎     | 9/21 [00:04<00:12,  1.01s/cell]Executing:  52%|█████▏    | 11/21 [00:16<00:24,  2.45s/cell]Executing:  62%|██████▏   | 13/21 [00:16<00:13,  1.74s/cell]Executing:  71%|███████▏  | 15/21 [00:16<00:07,  1.24s/cell]Executing:  81%|████████  | 17/21 [00:16<00:03,  1.12cell/s]Executing:  90%|█████████ | 19/21 [00:16<00:01,  1.52cell/s]Executing: 100%|██████████| 21/21 [00:17<00:00,  2.07cell/s]Executing: 100%|██████████| 21/21 [00:18<00:00,  1.15cell/s]
-removing run_notebooks/Run_Notebooks_12-29-2021.ipynb
+Executing:   5%|▍         | 1/21 [00:02<00:49,  2.47s/cell]Executing:  19%|█▉        | 4/21 [00:02<00:29,  1.75s/cell]Executing:  33%|███▎      | 7/21 [00:02<00:17,  1.24s/cell]Executing:  43%|████▎     | 9/21 [00:02<00:10,  1.13cell/s]Executing:  52%|█████▏    | 11/21 [00:11<00:19,  1.91s/cell]Executing:  62%|██████▏   | 13/21 [00:11<00:10,  1.36s/cell]Executing:  71%|███████▏  | 15/21 [00:11<00:05,  1.03cell/s]Executing:  81%|████████  | 17/21 [00:11<00:02,  1.43cell/s]Executing:  90%|█████████ | 19/21 [00:12<00:01,  1.96cell/s]Executing: 100%|██████████| 21/21 [00:12<00:00,  2.67cell/s]Executing: 100%|██████████| 21/21 [00:12<00:00,  1.66cell/s]
+removing run_notebooks/Run_Notebooks_02-05-2022.ipynb
