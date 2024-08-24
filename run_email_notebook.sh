@@ -10,7 +10,7 @@ RN_FILEPATH=$LOCATION$RN_FILENAME
 
 source /home/malcolm/main/bin/activate
 echo "Will be saving new notebook to: "$RN_FILEPATH
-papermill Weekly_Analysis.ipynb $RN_FILEPATH
+papermill Weekly_Analysis.ipynb $RN_FILEPATH --no-progress-bar
 
 # Testing 
 # papermill Run_Notebooks.ipynb $RN_FILEPATH -p db_location data/listening_history_qa.db 
