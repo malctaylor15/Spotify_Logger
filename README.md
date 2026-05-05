@@ -13,6 +13,8 @@ This is repository simply allows for the tracking of the spotify data.
 
 The listening_history.db file is an example of the output.
 
+For a detailed legacy pipeline walkthrough, database map, run instructions, and risk analysis, see [docs/pipeline_analysis.md](docs/pipeline_analysis.md).
+
 
 ### Important Files List
 
