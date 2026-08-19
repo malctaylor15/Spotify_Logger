@@ -8,12 +8,12 @@ RN_FILENAME=Run_Notebooks_${DATE}.ipynb
 LOCATION=run_notebooks/
 RN_FILEPATH=$LOCATION$RN_FILENAME
 
-# Generic venv because requirements are minimal
-source /home/malcolm/main/bin/activate
+# Use the repository-local environment created during setup.
+source .venv/bin/activate
 
 
 echo "Will be saving new notebook to: "$RN_FILEPATH
-papermill Run_Notebooks.ipynb $RN_FILEPATH -p db_location data/listening_history.db --no-progress-bar
+papermill get_latest_songs_prod.ipynb $RN_FILEPATH -p db_location data/listening_history.db --no-progress-bar
 # Testing 
 # papermill Run_Notebooks.ipynb $RN_FILEPATH -p db_location data/listening_history_qa.db 
 # 
@@ -24,9 +24,7 @@ then
   rm $RN_FILEPATH
 fi
 
-
-exit 0
+exit $papermill_exit_status
 
 # crontab -e
 # 45 9 * * * * bash scripts/run_notebooks.sh >> /home/pi/tickets_pull/run_notebook.log 2>&1
-
