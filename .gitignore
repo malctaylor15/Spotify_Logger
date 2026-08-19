@@ -15,3 +15,6 @@ images
 weekly_downloader/downloads/
 weekly_downloader/reports/
 weekly_downloader/python_upgrade_backup_*/
+
+# Sample database (real data lives in data/)
+listening_history.db
