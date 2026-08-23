@@ -1,0 +1,6 @@
+spotipy>=2.24,<3
+pandas>=2.2,<3
+papermill>=2.6,<3
+jupyter>=1.1,<2
+nbconvert>=7.16,<8
+ipykernel>=6.29,<8

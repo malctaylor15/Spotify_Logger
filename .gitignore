@@ -1,4 +1,7 @@
 data
+.venv/
+__pycache__/
+.DS_Store
 .cache*
 .spotify
 .ipynb*
@@ -7,3 +10,11 @@ run_notebooks/
 run_logs
 images
 *.log
+
+# Weekly downloader
+weekly_downloader/downloads/
+weekly_downloader/reports/
+weekly_downloader/python_upgrade_backup_*/
+
+# Sample database (real data lives in data/)
+listening_history.db
