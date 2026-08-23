@@ -1,18 +1,32 @@
-"""Configure and verify the local Spotify Web API connection."""
+"""Configure and verify the Spotify Web API connection.
 
+Credentials are stored in a `.env` file at the repo root (see
+`.env.sample` for the format) and loaded from there by every notebook
+via `dotenv.load_dotenv()`.
+
+Local machine with a browser:
+    .venv/bin/python config_helper.py
+
+Headless / remote server (no local browser can reach the redirect URI):
+    .venv/bin/python config_helper.py --remote
+    -> prints a login URL to open in any browser, then prompts you to
+       paste back the URL you were redirected to.
+
+Re-verify a saved connection without re-entering credentials:
+    .venv/bin/python config_helper.py --check-only [--remote]
+"""
 from __future__ import annotations
 
 import argparse
 import getpass
 import os
-import pickle
 from pathlib import Path
 
+from dotenv import load_dotenv, set_key
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-DATA_DIR = PROJECT_ROOT / "data"
-CREDENTIALS_PATH = DATA_DIR / "spotify_credentials.pkl"
-TOKEN_CACHE_PATH = DATA_DIR / ".spotify_cache"
+ENV_PATH = PROJECT_ROOT / ".env"
+TOKEN_CACHE_PATH = PROJECT_ROOT / "data" / ".spotify_cache"
 DEFAULT_REDIRECT_URI = "http://127.0.0.1:8888/callback"
 REQUIRED_KEYS = (
     "SPOTIPY_CLIENT_ID",
@@ -21,12 +35,26 @@ REQUIRED_KEYS = (
 )
 
 
+def existing_values() -> dict[str, str]:
+    if not ENV_PATH.exists():
+        return {}
+    load_dotenv(ENV_PATH, override=True)
+    return {key: os.environ.get(key, "") for key in REQUIRED_KEYS}
+
+
 def prompt_for_credentials() -> dict[str, str]:
+    current = existing_values()
     print("Paste values from your Spotify Developer Dashboard.")
-    client_id = input("Client ID: ").strip()
-    client_secret = getpass.getpass("Client secret (hidden): ").strip()
-    redirect_uri = input(f"Redirect URI [{DEFAULT_REDIRECT_URI}]: ").strip()
-    redirect_uri = redirect_uri or DEFAULT_REDIRECT_URI
+    print("Press enter to keep the current value shown in [brackets].\n")
+
+    client_id_default = current.get("SPOTIPY_CLIENT_ID", "")
+    client_id = input(f"Client ID [{client_id_default or 'none'}]: ").strip() or client_id_default
+
+    client_secret = getpass.getpass("Client secret (hidden, enter to keep current): ").strip()
+    client_secret = client_secret or current.get("SPOTIPY_CLIENT_SECRET", "")
+
+    redirect_default = current.get("SPOTIPY_REDIRECT_URI") or DEFAULT_REDIRECT_URI
+    redirect_uri = input(f"Redirect URI [{redirect_default}]: ").strip() or redirect_default
 
     credentials = {
         "SPOTIPY_CLIENT_ID": client_id,
@@ -40,42 +68,46 @@ def prompt_for_credentials() -> dict[str, str]:
 
 
 def save_credentials(credentials: dict[str, str]) -> None:
-    DATA_DIR.mkdir(exist_ok=True)
-    with CREDENTIALS_PATH.open("wb") as handle:
-        pickle.dump(credentials, handle)
-    CREDENTIALS_PATH.chmod(0o600)
-    print(f"Saved credentials to {CREDENTIALS_PATH}")
+    ENV_PATH.touch(exist_ok=True)
+    ENV_PATH.chmod(0o600)
+    for key, value in credentials.items():
+        set_key(str(ENV_PATH), key, value)
+    print(f"Saved credentials to {ENV_PATH}")
 
 
 def load_credentials() -> dict[str, str]:
-    if not CREDENTIALS_PATH.exists():
+    if not ENV_PATH.exists():
         raise SystemExit(
-            f"No credentials found at {CREDENTIALS_PATH}. "
-            "Run this script without --check-only first."
+            f"No credentials found at {ENV_PATH}. "
+            "Run this script without --check-only first, or copy .env.sample to .env."
         )
-    with CREDENTIALS_PATH.open("rb") as handle:
-        credentials = pickle.load(handle)
-    missing = [key for key in REQUIRED_KEYS if not credentials.get(key)]
+    credentials = existing_values()
+    missing = [key for key, value in credentials.items() if not value]
     if missing:
-        raise SystemExit(f"Credential file is missing: {', '.join(missing)}")
+        raise SystemExit(f"{ENV_PATH} is missing: {', '.join(missing)}")
     return credentials
 
 
-def verify_connection(credentials: dict[str, str]) -> None:
-    try:
-        import spotipy
-        from spotipy.oauth2 import SpotifyOAuth
-    except ImportError as exc:
-        raise SystemExit(
-            "Spotipy is not installed. Run: .venv/bin/python -m pip install -r requirements.txt"
-        ) from exc
+def verify_connection(credentials: dict[str, str], remote: bool) -> None:
+    import spotipy
+    from spotipy.oauth2 import SpotifyOAuth
 
     os.environ.update(credentials)
+    TOKEN_CACHE_PATH.parent.mkdir(exist_ok=True)
     auth_manager = SpotifyOAuth(
         scope="user-read-recently-played",
         cache_path=str(TOKEN_CACHE_PATH),
-        open_browser=True,
+        open_browser=not remote,
     )
+
+    has_cached_token = auth_manager.validate_token(auth_manager.cache_handler.get_cached_token()) is not None
+    if remote and not has_cached_token:
+        print("\nOpen this URL in any browser (it does not need to run on this machine):\n")
+        print(auth_manager.get_authorize_url())
+        response = input("\nPaste the full URL you were redirected to: ").strip()
+        code = auth_manager.parse_response_code(response)
+        auth_manager.get_access_token(code, as_dict=False)
+
     spotify = spotipy.Spotify(auth_manager=auth_manager)
     spotify.current_user_recently_played(limit=1)
     print("Spotify connection verified. The token cache is ready for future runs.")
@@ -90,6 +122,12 @@ def main() -> None:
         action="store_true",
         help="Use the saved credentials without asking for them again.",
     )
+    parser.add_argument(
+        "--remote",
+        action="store_true",
+        help="Headless flow: print the login URL instead of opening a browser, "
+        "and prompt for the redirected URL to paste back in.",
+    )
     args = parser.parse_args()
 
     if args.check_only:
@@ -97,7 +135,7 @@ def main() -> None:
     else:
         credentials = prompt_for_credentials()
         save_credentials(credentials)
-    verify_connection(credentials)
+    verify_connection(credentials, remote=args.remote)
 
 
 if __name__ == "__main__":

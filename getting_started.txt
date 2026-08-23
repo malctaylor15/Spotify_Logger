@@ -1,8 +1,11 @@
-After cloning the repository, follow the current "Local Spotify setup" section in README.md.
+After cloning the repository, follow the current "Local Spotify setup" (or
+"Remote / headless setup" on a server with no local browser) section in
+README.md.
 
-1. Run `.venv/bin/python config_helper.py` to save the Spotify app credentials and complete OAuth.
-2. Run `bash run_notebook.sh` to create or update `data/listening_history.db`.
-3. Optionally schedule `run_notebook.sh` every two hours for continuous collection.
+1. Copy `.env.sample` to `.env` and fill in the Spotify client ID/secret and redirect URI.
+2. Run `.venv/bin/python config_helper.py` (add `--remote` on a headless server) to save the credentials to `.env` and complete OAuth.
+3. Run `bash run_notebook.sh` to create or update `data/listening_history.db`.
+4. Optionally schedule `run_notebook.sh` every two hours for continuous collection.
 
 The remaining notes below describe the optional legacy email-reporting and AWS-backup setup. They are not required for Spotify history ingestion.
 
