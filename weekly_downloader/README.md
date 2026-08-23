@@ -176,6 +176,63 @@ weekly_downloader/
 The `downloads/` folder is gitignored so audio files never enter the repo
 history.
 
+## The library database
+
+`library_db.py` maintains `data/weekly_downloader.db` (gitignored), which stops
+either job repeating work and stores every number that feeds the email.
+
+**`downloads`** — one row per song ever fetched:
+
+| Column | Notes |
+|---|---|
+| `name`, `artist_name` | As they appear in Spotify |
+| `match_key` | Normalised `artist\|title`, UNIQUE — the dedupe key |
+| `week_of`, `downloaded_at` | Which week it was fetched for, and when |
+| `file_path`, `file_bytes` | Where the mp3 landed |
+| `youtube_id`, `player_client` | Which video, and which client succeeded |
+| `plays`, `minutes` | The listening stats it was ranked on |
+| `status` | `downloaded` or `failed` |
+
+**`stem_analysis`** — one row per stem per song, holding rank, composite score,
+every raw measure (`rms_db`, `peak_db`, `crest_db`, `activity`, `flux`,
+`entropy`), every normalised component (`n_loudness`, `n_variation`,
+`n_activity`, `n_dynamics`, `n_entropy`), and the rendered description. Song
+name, artist and week are denormalised onto this table deliberately, so the
+email can be rebuilt from it alone.
+
+### Never doing the same work twice
+
+Before downloading, each song is checked against the database **and** against
+every `week_of_*` folder on disk. The disk scan matters because a song can
+exist without a database row — an older download, or a deleted database — and
+because a track you played again this week was probably already fetched weeks
+ago.
+
+Matching is normalised for case, accents, punctuation and whitespace, so
+`Djôn'Maya` and `Djon'Maya` are recognised as the same song rather than
+downloaded twice.
+
+Analysis is skipped for any track already scored, so re-running is cheap.
+
+```bash
+python3 weekly_downloader/download_weekly.py --redownload   # ignore the library
+python3 weekly_downloader/analyze_stems.py --reanalyse      # re-run Demucs
+```
+
+### Rebuilding the email without audio
+
+Because every email metric is stored, a past week's report can be regenerated
+with no mp3s and no Demucs:
+
+```bash
+python3 weekly_downloader/analyze_stems.py --from-db              # newest week
+python3 weekly_downloader/analyze_stems.py --from-db 2026-08-11   # a specific week
+python3 weekly_downloader/analyze_stems.py --from-db --send       # and email it
+```
+
+Verified: with `downloads/` deleted entirely, `--from-db` reproduces a
+byte-identical report.
+
 ## Local stem analysis + email recommendations
 
 `analyze_stems.py` separates each track locally with **Demucs**, scores every

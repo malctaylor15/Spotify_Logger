@@ -24,6 +24,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import library_db
+
 HERE = Path(__file__).resolve().parent          # .../Spotify_Logger/weekly_downloader
 REPO_ROOT = HERE.parent                          # .../Spotify_Logger
 DEFAULT_DB = REPO_ROOT / "data" / "listening_history.db"
@@ -272,11 +274,14 @@ PLAYER_CLIENT_FALLBACKS = [
 
 
 def download_song(name: str, artist: str, week_dir: Path, archive: Path,
-                  extra_args: list[str], clients: list[str | None]) -> bool:
+                  extra_args: list[str], clients: list[str | None]
+                  ) -> tuple[bool, str | None, str | None]:
     """Search YouTube for the song's music video and save audio as mp3.
 
     Retries across player clients, because a 403 on the media URL is usually
     specific to the client that produced the format URL.
+
+    Returns (ok, youtube_id, player_client_used).
     """
     query = f"{artist} {name} official music video"
     out_template = str(week_dir / f"{sanitize(artist)} - {sanitize(name)}.%(ext)s")
@@ -301,11 +306,27 @@ def download_song(name: str, artist: str, week_dir: Path, archive: Path,
         if attempt:
             print(f"     403 or failure - retrying with player_client="
                   f"{client or 'default'}")
+        before = _archive_ids(archive)
         if subprocess.run(cmd).returncode == 0:
             if attempt:
                 print(f"     succeeded with player_client={client or 'default'}")
-            return True
-    return False
+            # The download archive gains a "youtube <id>" line per success, so
+            # diffing it recovers the video id without a second network call.
+            new_ids = _archive_ids(archive) - before
+            return True, (new_ids.pop() if new_ids else None), client
+    return False, None, None
+
+
+def _archive_ids(archive: Path) -> set[str]:
+    """Video ids currently recorded in the yt-dlp download archive."""
+    if not archive.exists():
+        return set()
+    ids = set()
+    for line in archive.read_text(errors="ignore").splitlines():
+        parts = line.split()
+        if len(parts) >= 2:
+            ids.add(parts[1])
+    return ids
 
 
 def main() -> int:
@@ -330,6 +351,11 @@ def main() -> int:
                              "to set your own fallback order). Default order: "
                              + ", ".join(c or "default"
                                          for c in PLAYER_CLIENT_FALLBACKS))
+    parser.add_argument("--library-db", type=Path, default=None,
+                        help=f"Library database tracking downloads/analysis "
+                             f"(default: {library_db.DEFAULT_DB})")
+    parser.add_argument("--redownload", action="store_true",
+                        help="Ignore the library and re-download everything")
     parser.add_argument("--cookies-from-browser", metavar="BROWSER",
                         help="Pass browser cookies to yt-dlp (e.g. safari, "
                              "chrome, firefox). Enables the 'tv' client and "
@@ -393,13 +419,50 @@ def main() -> int:
     week_dir.mkdir(parents=True, exist_ok=True)
     archive = DOWNLOADS_DIR / "download_archive.txt"
 
-    failures = []
+    library = library_db.connect(args.library_db)
+    week_of = week_start.isoformat()
+
+    failures, skipped, fetched = [], [], []
     for i, (name, artist, plays, minutes) in enumerate(songs, 1):
         print(f"[{i}/{len(songs)}] {artist} - {name}")
-        if not download_song(name, artist, week_dir, archive, extra_args, clients):
+
+        if not args.redownload:
+            seen, reason = library_db.already_downloaded(library, name, artist,
+                                                         DOWNLOADS_DIR)
+            if seen:
+                print(f"     skip - {reason}")
+                skipped.append(f"{artist} - {name}")
+                # Keep the ranking fresh even when the audio is reused.
+                library_db.record_download(
+                    library, name=name, artist=artist, week_of=week_of,
+                    plays=plays, minutes=minutes)
+                continue
+            if reason:
+                print(f"     {reason}")
+
+        ok, video_id, client_used = download_song(
+            name, artist, week_dir, archive, extra_args, clients)
+        if ok:
+            expected = week_dir / f"{library_db.safe_filename(name, artist)}.mp3"
+            library_db.record_download(
+                library, name=name, artist=artist, week_of=week_of,
+                file_path=expected if expected.exists() else None,
+                youtube_id=video_id, player_client=client_used or "default",
+                plays=plays, minutes=minutes, status="downloaded")
+            fetched.append(f"{artist} - {name}")
+        else:
+            library_db.record_download(
+                library, name=name, artist=artist, week_of=week_of,
+                plays=plays, minutes=minutes, status="failed")
             failures.append(f"{artist} - {name}")
 
     print(f"\nDone. Files are in: {week_dir}")
+    print(f"  downloaded: {len(fetched)}   skipped (already had): "
+          f"{len(skipped)}   failed: {len(failures)}")
+    stats = library_db.summary(library)
+    print(f"  library: {stats['downloads']} songs across {stats['weeks']} week(s), "
+          f"{stats['analysed']} analysed")
+
     if failures:
         print("Failed to download:")
         for f in failures:

@@ -1,5 +1,9 @@
 ## Spotify Logger  
 
+**[DOCUMENTATION.md](DOCUMENTATION.md) is the index for all documentation in
+this repository** — what the project does, every entry point, the data model,
+and links to each guide.
+
 Repository to save spotify listening history to database 
 
 This will allow for future analysis of different genre's, listening trends etc 

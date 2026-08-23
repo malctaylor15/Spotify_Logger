@@ -53,12 +53,16 @@ say "Staging"
 git add weekly_downloader/download_weekly.py
 git add weekly_downloader/separate_stems.py
 git add weekly_downloader/analyze_stems.py
+git add weekly_downloader/library_db.py
+git add weekly_downloader/import_reports.py
+git add weekly_downloader/set_email_password.py
 git add weekly_downloader/upgrade_python.sh
 git add weekly_downloader/cleanup_repo.sh
 git add weekly_downloader/commit_weekly_downloader.sh
 git add weekly_downloader/README.md
 git add weekly_downloader/WORKING_SETUP.md
 git add .gitignore
+git add DOCUMENTATION.md
 
 # Modifications to already-tracked files (stripped notebooks, deletions).
 git add -u
@@ -115,6 +119,15 @@ New tooling:
   Gmail setup. Normalisation ignores silent stems, which would otherwise sit
   at roughly -240 dB and compress every real stem to the top of the scale.
 
+- library_db.py: a small SQLite library at data/weekly_downloader.db so neither
+  job repeats work. The downloads table records every song ever fetched, keyed
+  on a normalised artist|title that tolerates case, accent and whitespace
+  differences; the stem_analysis table stores rank, composite score and every
+  raw and normalised measure behind it. Songs are checked against both the
+  database and every week folder on disk before downloading, since a track can
+  exist without a row. Because all email inputs are persisted, a past week's
+  report can be regenerated with --from-db and no audio at all.
+
 - separate_stems.py: optional cloud separation via the Music AI API.
 
 - upgrade_python.sh / cleanup_repo.sh: rebuild the virtualenvs on a newer
@@ -122,6 +135,13 @@ New tooling:
 
 - WORKING_SETUP.md: records the verified-working configuration and the three
   distinct YouTube failure modes, each needing a different fix.
+
+Documentation:
+
+- DOCUMENTATION.md: a single index for the whole repository covering what the
+  project does, every entry point, the database schema, credential locations,
+  scheduled jobs and known rough edges, with links to each existing guide.
+  The root README now points at it.
 
 Repository cleanup:
 

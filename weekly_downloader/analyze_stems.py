@@ -32,6 +32,8 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
+import library_db
+
 HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parent
 DOWNLOADS_DIR = HERE / "downloads"
@@ -196,6 +198,8 @@ def score_stems(raw: dict[str, dict]) -> dict[str, dict]:
 
 def describe(name: str, m: dict) -> str:
     """One-line, human reason why this stem is (or isn't) interesting."""
+    if m.get("description"):
+        return m["description"]
     if m["score"] == 0.0:
         return "essentially absent from this track"
     bits = []
@@ -228,10 +232,29 @@ def run_demucs(track: Path, out_dir: Path, model: str = DEMUCS_MODEL) -> Path | 
     return stem_dir if stem_dir.is_dir() else None
 
 
-def analyse_track(track: Path, workdir: Path, model: str,
-                  keep_stems: bool) -> dict | None:
-    """Separate and score one track."""
+def split_title(stem_name: str) -> tuple[str, str]:
+    """Recover (artist, title) from an 'Artist - Title' filename."""
+    if " - " in stem_name:
+        artist, title = stem_name.split(" - ", 1)
+        return artist.strip(), title.strip()
+    return "", stem_name
+
+
+def analyse_track(track: Path, workdir: Path, model: str, keep_stems: bool,
+                  library=None, week_of: str = "", force: bool = False
+                  ) -> dict | None:
+    """Separate and score one track, reusing stored results when available."""
     print(f"\n=== {track.name} ===")
+    artist, title = split_title(track.stem)
+
+    if library is not None and not force:
+        row = library_db.get_download(library, title, artist)
+        if row and library_db.is_analysed(library, int(row["id"])):
+            print("  already analysed - reusing stored metrics")
+            for cached in library_db.load_week_results(library, row["week_of"]):
+                if cached["track"] == track.stem:
+                    return cached
+
     print("  separating (this takes a few minutes per track) ...")
     stem_dir = run_demucs(track, workdir, model)
     if stem_dir is None:
@@ -254,6 +277,15 @@ def analyse_track(track: Path, workdir: Path, model: str,
 
     if not keep_stems:
         shutil.rmtree(stem_dir, ignore_errors=True)
+
+    if library is not None:
+        download_id = library_db.record_download(
+            library, name=title, artist=artist,
+            week_of=week_of or "unknown", file_path=track)
+        library_db.record_analysis(
+            library, download_id=download_id, name=title, artist=artist,
+            week_of=week_of or "unknown", model=model,
+            ranked_stems=ranked, describe=describe)
 
     return {"track": track.stem, "stems": dict(ranked),
             "ranking": [n for n, _ in ranked]}
@@ -380,7 +412,41 @@ def main() -> int:
                         help="Write the HTML report but do not email it")
     parser.add_argument("--send", action="store_true",
                         help="Email the recommendations when finished")
+    parser.add_argument("--library-db", type=Path, default=None,
+                        help="Library database of downloads and stem metrics")
+    parser.add_argument("--reanalyse", "--reanalyze", action="store_true",
+                        dest="reanalyse",
+                        help="Re-run Demucs even for already-analysed tracks")
+    parser.add_argument("--from-db", metavar="WEEK", nargs="?", const="latest",
+                        help="Rebuild the report/email from stored metrics "
+                             "without any audio. Optionally name a week "
+                             "(e.g. 2026-08-11); defaults to the newest.")
     args = parser.parse_args()
+
+    library = library_db.connect(args.library_db)
+
+    # Rebuild from stored metrics only -- no audio, no Demucs.
+    if args.from_db:
+        weeks = library_db.available_weeks(library)
+        if not weeks:
+            print("No analysed weeks in the library yet.", file=sys.stderr)
+            return 1
+        week = weeks[0] if args.from_db == "latest" else args.from_db
+        results = library_db.load_week_results(library, week)
+        if not results:
+            print(f"No stored analysis for week {week}. "
+                  f"Available: {', '.join(weeks)}", file=sys.stderr)
+            return 1
+        print(f"Rebuilt {len(results)} track(s) for week {week} from the library.")
+        print("\n" + build_text(results, week))
+        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+        html = build_html(results, week)
+        (REPORTS_DIR / f"stems_{week}.html").write_text(html)
+        print(f"Report written to {REPORTS_DIR / f'stems_{week}.html'}")
+        if args.send:
+            return 0 if send_email(f"Stem recommendations - week of {week}",
+                                   build_text(results, week), html) else 1
+        return 0
 
     folder = args.folder or newest_week_folder()
     if folder is None or not folder.is_dir():
@@ -411,7 +477,9 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="demucs_") as tmp:
         workdir = Path(tmp)
         for track in tracks:
-            res = analyse_track(track, workdir, args.model, args.keep_stems)
+            res = analyse_track(track, workdir, args.model, args.keep_stems,
+                                library=library, week_of=week,
+                                force=args.reanalyse)
             if res:
                 results.append(res)
 
