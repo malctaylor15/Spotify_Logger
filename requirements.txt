@@ -1,7 +1,22 @@
+# One environment for the whole repo: ingestion, reporting and the weekly
+# downloader all run from .venv. Rebuild with:
+#   python3 -m venv .venv && .venv/bin/python -m pip install -r requirements.txt
+
+# --- Spotify ingestion (get_latest_songs_prod.ipynb, config_helper.py)
 spotipy>=2.24,<3
 python-dotenv>=1.0,<2
 pandas>=2.2,<3
+
+# --- Notebook execution (run_notebook.sh, run_email_notebook.sh, run_analysis_monthly.sh)
 papermill>=2.6,<3
 jupyter>=1.1,<2
 nbconvert>=7.16,<8
 ipykernel>=6.29,<8
+
+# --- Weekly / monthly reporting (Weekly_Analysis.ipynb)
+# kaleido is pinned to 0.2.1: it renders plotly figures to PNG headlessly.
+# kaleido 1.x drives a real Chromium instead, which this box does not have.
+plotly>=5.20,<6
+kaleido==0.2.1
+scikit-learn>=1.4,<2
+matplotlib>=3.8,<4          # required by Slope/plotSlope.py for the genre bump plot

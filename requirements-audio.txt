@@ -1,0 +1,14 @@
+# Extra dependencies for weekly_downloader/ (download_weekly.py, analyze_stems.py).
+# Installed into the same .venv:
+#   .venv/bin/python -m pip install -r requirements-audio.txt
+#
+# Kept out of requirements.txt because torch alone is ~2GB and neither the
+# ingestion nor the reporting job needs any of it.
+#
+# Also required on PATH, installed outside pip:
+#   ffmpeg   (apt install ffmpeg)   - converts downloaded webm to mp3
+#   deno     (yt-dlp JS runtime)    - solves YouTube signature challenges
+
+yt-dlp[default]>=2026.7          # [default] pulls in yt-dlp-ejs, the JS solver
+demucs>=4.0,<5                   # local 4-stem separation
+soundfile>=0.12                  # reads the separated stem WAVs

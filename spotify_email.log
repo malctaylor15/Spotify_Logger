@@ -1,69 +1,0 @@
-current working directory: /home/malcolm/Spotify_Logger
-Will be saving new notebook to: run_notebooks/Weekly_Analysis_01-30-2022.ipynb
-Input Notebook:  Weekly_Analysis.ipynb
-Output Notebook: run_notebooks/Weekly_Analysis_01-30-2022.ipynb
-Executing:   0%|          | 0/87 [00:00<?, ?cell/s]Executing notebook with kernel: python3
-Executing:   1%|          | 1/87 [00:08<12:07,  8.46s/cell]Executing:   2%|▏         | 2/87 [00:08<08:27,  5.98s/cell]Executing:   3%|▎         | 3/87 [00:08<06:00,  4.29s/cell]Executing:   5%|▍         | 4/87 [00:09<04:13,  3.06s/cell]Executing:   6%|▌         | 5/87 [00:09<02:59,  2.19s/cell]Executing:   7%|▋         | 6/87 [00:09<02:09,  1.60s/cell]Executing:   8%|▊         | 7/87 [00:09<01:34,  1.18s/cell]Executing:   9%|▉         | 8/87 [00:10<01:19,  1.00s/cell]Executing:  10%|█         | 9/87 [00:10<01:01,  1.27cell/s]Executing:  11%|█▏        | 10/87 [00:10<00:47,  1.62cell/s]Executing:  13%|█▎        | 11/87 [00:11<00:37,  2.05cell/s]Executing:  14%|█▍        | 12/87 [00:11<00:31,  2.38cell/s]Executing:  15%|█▍        | 13/87 [00:11<00:27,  2.65cell/s]Executing:  16%|█▌        | 14/87 [00:11<00:25,  2.82cell/s]Executing:  17%|█▋        | 15/87 [00:12<00:25,  2.79cell/s]Executing:  18%|█▊        | 16/87 [00:12<00:24,  2.94cell/s]Executing:  20%|█▉        | 17/87 [00:12<00:20,  3.42cell/s]Executing:  21%|██        | 18/87 [00:12<00:17,  3.84cell/s]Executing:  22%|██▏       | 19/87 [00:13<00:17,  3.99cell/s]Executing:  23%|██▎       | 20/87 [00:13<00:15,  4.19cell/s]Executing:  24%|██▍       | 21/87 [00:13<00:18,  3.61cell/s]Executing:  25%|██▌       | 22/87 [00:14<00:18,  3.51cell/s]Executing:  26%|██▋       | 23/87 [00:14<00:17,  3.62cell/s]Executing:  28%|██▊       | 24/87 [00:14<00:15,  3.97cell/s]Executing:  29%|██▊       | 25/87 [00:14<00:14,  4.23cell/s]Executing:  30%|██▉       | 26/87 [00:15<00:16,  3.64cell/s]Executing:  31%|███       | 27/87 [00:15<00:15,  3.78cell/s]Executing:  32%|███▏      | 28/87 [00:15<00:14,  4.05cell/s]Executing:  33%|███▎      | 29/87 [00:19<01:27,  1.51s/cell]Executing:  34%|███▍      | 30/87 [00:20<01:09,  1.23s/cell]Executing:  36%|███▌      | 31/87 [00:21<01:00,  1.09s/cell]Executing:  37%|███▋      | 32/87 [00:21<00:49,  1.11cell/s]Executing:  38%|███▊      | 33/87 [00:22<00:41,  1.31cell/s]Executing:  39%|███▉      | 34/87 [00:22<00:37,  1.43cell/s]Executing:  40%|████      | 35/87 [00:23<00:32,  1.62cell/s]Executing:  41%|████▏     | 36/87 [00:23<00:29,  1.71cell/s]Executing:  43%|████▎     | 37/87 [00:26<00:59,  1.19s/cell]Executing:  44%|████▎     | 38/87 [00:26<00:47,  1.04cell/s]Executing:  45%|████▍     | 39/87 [00:27<00:38,  1.25cell/s]Executing:  46%|████▌     | 40/87 [00:27<00:34,  1.37cell/s]Executing:  47%|████▋     | 41/87 [00:28<00:29,  1.53cell/s]Executing:  48%|████▊     | 42/87 [00:28<00:28,  1.58cell/s]Executing:  49%|████▉     | 43/87 [00:29<00:26,  1.64cell/s]Executing:  51%|█████     | 44/87 [00:29<00:26,  1.63cell/s]Executing:  52%|█████▏    | 45/87 [00:30<00:25,  1.62cell/s]Executing:  53%|█████▎    | 46/87 [00:31<00:27,  1.50cell/s]Executing:  54%|█████▍    | 47/87 [00:31<00:24,  1.63cell/s]Executing:  55%|█████▌    | 48/87 [00:32<00:22,  1.71cell/s]Executing:  56%|█████▋    | 49/87 [00:32<00:21,  1.74cell/s]Executing:  57%|█████▋    | 50/87 [00:33<00:20,  1.77cell/s]Executing:  59%|█████▊    | 51/87 [00:33<00:18,  1.90cell/s]Executing:  60%|█████▉    | 52/87 [00:34<00:21,  1.61cell/s]Executing:  61%|██████    | 53/87 [00:35<00:20,  1.69cell/s]Executing:  62%|██████▏   | 54/87 [00:35<00:18,  1.75cell/s]Executing:  63%|██████▎   | 55/87 [00:39<00:47,  1.48s/cell]Executing:  63%|██████▎   | 55/87 [00:41<00:24,  1.33cell/s]
-Traceback (most recent call last):
-  File "/home/malcolm/main/bin/papermill", line 8, in <module>
-    sys.exit(papermill())
-  File "/home/malcolm/main/lib/python3.6/site-packages/click/core.py", line 829, in __call__
-    return self.main(*args, **kwargs)
-  File "/home/malcolm/main/lib/python3.6/site-packages/click/core.py", line 782, in main
-    rv = self.invoke(ctx)
-  File "/home/malcolm/main/lib/python3.6/site-packages/click/core.py", line 1066, in invoke
-    return ctx.invoke(self.callback, **ctx.params)
-  File "/home/malcolm/main/lib/python3.6/site-packages/click/core.py", line 610, in invoke
-    return callback(*args, **kwargs)
-  File "/home/malcolm/main/lib/python3.6/site-packages/click/decorators.py", line 21, in new_func
-    return f(get_current_context(), *args, **kwargs)
-  File "/home/malcolm/main/lib/python3.6/site-packages/papermill/cli.py", line 256, in papermill
-    execution_timeout=execution_timeout,
-  File "/home/malcolm/main/lib/python3.6/site-packages/papermill/execute.py", line 110, in execute_notebook
-    raise_for_execution_errors(nb, output_path)
-  File "/home/malcolm/main/lib/python3.6/site-packages/papermill/execute.py", line 222, in raise_for_execution_errors
-    raise error
-papermill.exceptions.PapermillExecutionError: 
----------------------------------------------------------------------------
-Exception encountered at "In [42]":
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-<ipython-input-42-335fcde1e2fc> in <module>
-      1 source_details = pd.Series(playlist_hist['playlist_id'].dropna())\
-----> 2     .apply(lambda x:parse_source_uri(spotify, x))
-      3 all_playlist_info = pd.merge(playlist_hist, source_details
-      4                              , left_on='playlist_id', right_on='uri', how='outer')
-      5 all_playlist_info = all_playlist_info.sort_values('Mins Listened', ascending=False)
-
-~/main/lib/python3.6/site-packages/pandas/core/series.py in apply(self, func, convert_dtype, args, **kwds)
-   4210             else:
-   4211                 values = self.astype(object)._values
--> 4212                 mapped = lib.map_infer(values, f, convert=convert_dtype)
-   4213 
-   4214         if len(mapped) and isinstance(mapped[0], Series):
-
-pandas/_libs/lib.pyx in pandas._libs.lib.map_infer()
-
-<ipython-input-42-335fcde1e2fc> in <lambda>(x)
-      1 source_details = pd.Series(playlist_hist['playlist_id'].dropna())\
-----> 2     .apply(lambda x:parse_source_uri(spotify, x))
-      3 all_playlist_info = pd.merge(playlist_hist, source_details
-      4                              , left_on='playlist_id', right_on='uri', how='outer')
-      5 all_playlist_info = all_playlist_info.sort_values('Mins Listened', ascending=False)
-
-<ipython-input-38-aaf00e344626> in parse_source_uri(spotify, uri)
-      4         details = parse_playlist_details(spotify, split_uri[2])
-      5     elif split_uri[1] == 'album':
-----> 6         details = parse_album_details(spotify, split_uri[2])
-      7     elif split_uri[1] == 'artist':
-      8         details = parse_artist_details(spotify, split_uri[2])
-
-<ipython-input-36-72f254d7b7e5> in parse_album_details(spotify, album_id)
-      4     num_artists = len(album_call['artists'])
-      5     artist_part = album_call['artists'][0]['name'] if num_artists == 1\
-----> 6         else album_call['artists'][0] + f' - {num_artists} artists'
-      7     out['Name'] = album_call['name'] + ' - '+ artist_part
-      8     out['Num Tracks'] = album_call['total_tracks']
-
-TypeError: unsupported operand type(s) for +: 'dict' and 'str'
-

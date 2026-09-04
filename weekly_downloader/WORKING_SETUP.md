@@ -59,7 +59,7 @@ Because android_vr failed 100% of the time, `web_embedded` is now tried
 search instead of two. yt-dlp's default is kept second so the script self-heals
 if the situation reverses.
 
-## The three errors, in the order they were hit
+## The four errors, in the order they were hit
 
 Each is a genuinely different failure. The distinction matters, because the fix
 for one does nothing for the others.
@@ -69,6 +69,7 @@ for one does nothing for the others.
 | 1 | `The following content is not available on this app` | yt-dlp was a year old (`2025.08.11`) | Upgrade yt-dlp |
 | 2 | `Signature solving failed` → `Requested format is not available` | No JS runtime, no EJS solver | `brew install deno` + `pip install -U "yt-dlp[default]"` |
 | 3 | `unable to download video data: HTTP Error 403` | Client needs a PO Token it can't supply | Switch player client to `web_embedded` |
+| 4 | `Sign in to confirm you're not a bot` | YouTube is bot-checking this host's IP | Supply cookies: `--cookies <file>` |
 
 Key trap: **error 2 is not fixed by switching player clients** (that was a wrong
 turn taken during debugging — forcing `tv_simply` introduced a *new* PO Token
@@ -97,8 +98,41 @@ for anything missing. Then, by symptom:
   `python3 -m pip install -U bgutil-ytdlp-pot-provider`
 - **`Signature solving failed` returns** → deno or the EJS package went missing;
   re-run the install line at the top.
+- **`Sign in to confirm you're not a bot` on every song** → this is *not* a
+  403 and no player client fixes it; YouTube wants an authenticated session
+  from this IP. Neither a newer yt-dlp nor a running PO Token provider helps.
+  Export cookies from a signed-in browser to a Netscape-format file and pass
+  `--cookies /path/to/youtube_cookies.txt` (or set `COOKIES=` for
+  `run_weekly_stems.sh`). Using your own account carries a ban risk; a
+  throwaway account is safer.
 - **Nothing works** → `--update-ytdlp`. YouTube-side breakage is usually fixed
   upstream within days.
+
+### Cookie-free paths, all tested and ruled out on 2026-09-04
+
+- Running the bgutil PO Token server on :4416, including
+  `fetch_pot=always` on `web`, `web_embedded` and `tv` — no change. The
+  rejection happens on the player API response, before a GVS token matters.
+- Every player client (`web`, `web_embedded`, `tv`, `tv_embedded`,
+  `tv_simply`, `web_safari`, `web_creator`, `web_music`, `mweb`, `ios`,
+  `android`, `android_vr`, `mediaconnect`) — all bot-checked.
+- Anonymous, not-signed-in cookies scraped from youtube.com with curl —
+  YouTube sets no usable cookie without a browser.
+- SoundCloud (`scsearch1:`) as an alternate source — official label tracks
+  return 30-second previews or DRM errors. A 30s clip would quietly change
+  what the stem scores mean, so it is deliberately not wired in.
+
+What is left: signed-in cookies (`--cookies`, ban risk, prefer a throwaway
+account) or a cleaner exit IP (`--proxy`, no account involved). YouTube search
+still works from this host — only the video fetch is gated.
+
+### Status on 2026-09-04
+
+Every song failed with error 4, at all five player clients. Verified that
+yt-dlp 2026.08.19, deno, the EJS solver and ffmpeg are all healthy
+(`--doctor` passes), that YouTube *search* still works, and that starting the
+bgutil PO Token server on :4416 changes nothing. Downloads need cookies until
+YouTube stops bot-checking this host.
 
 ## Moises stem separation — what works, tested 2026-08-19
 

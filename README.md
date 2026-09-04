@@ -15,32 +15,51 @@ So we use spotify's API to save recently listened history to sqlite database. We
 Once the data is captured, we can do analysis later on by tracking popular artists, genre trends, and potential lyrical trends. 
 This is repository simply allows for the tracking of the spotify data. 
 
-The listening_history.db file is an example of the output.
+The runtime database is `data/listening_history.db` (gitignored).
 
-For a detailed legacy pipeline walkthrough, database map, run instructions, and risk analysis, see [docs/pipeline_analysis.md](docs/pipeline_analysis.md).
+**[DOCUMENTATION.md](DOCUMENTATION.md) is the index for all documentation here.**
+[docs/pipeline_analysis.md](docs/pipeline_analysis.md) is an older deep-dive and
+describes a credential layout that has since changed; where the two disagree,
+DOCUMENTATION.md is authoritative.
 
 
 ### Important Files List
 
 * get_latest_songs_prod.ipynb is the notebook that makes the spotify API calls to get the latest songs a user has listened to and save them to a listening_history.db. This notebook is run by the Run Notebooks notebook. 
 
-* Run_Notebook.ipynb is a wrapper notebook for the spotify calls notebook. If there are any errors in the Spotify calls notebook, this notebook will send an email to alert of the failures. This notebook is used in the command line script. 
+* `run_notebook.sh` is the command line script that runs `get_latest_songs_prod.ipynb` in the `.venv` environment. It logs to `run_logs/`, and on failure emails an alert via `alerting.py` and keeps the executed notebook under `run_notebooks/`. It can be referenced by cron; the last line of the file shows an example entry.
 
-* run_notebook.sh is the command line script that runs the Run_Notebook.ipynb in the proper environment. This script can be referenced by cron the scheduler. The last line of the file shows an example entry in cron. 
+* `alerting.py` is the shared failure alerting used by every scheduled job. Set `ALERT_DRY_RUN=1` to test a job's failure path without sending mail.
+
+* `Weekly_Analysis.ipynb` builds the weekly/monthly email report. It takes `db_location`, `look_back_days` and `send_email` as papermill parameters — pass `-p send_email False` to build the report and its plots without sending anything.
 
 * `config_helper.py` safely prompts for a Spotify client ID, client secret, and redirect URI, saves them to a gitignored `.env` file at the repo root, and completes the initial authorization (browser-based locally, or a paste-back URL flow on a headless server via `--remote`). Every notebook loads these same values with `dotenv.load_dotenv()`.
 
 * `.env.sample` documents the three required variables (`SPOTIPY_CLIENT_ID`, `SPOTIPY_CLIENT_SECRET`, `SPOTIPY_REDIRECT_URI`). Copy it to `.env` and fill in the two secret values — `.env` itself is gitignored and never committed.
 
 
-### Local Spotify setup (Mac, browser available)
+### Environment
+
+One `.venv` serves the whole repo — ingestion, reporting and the weekly
+downloader. All four `run_*.sh` scripts activate it.
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt        # ingestion + reporting
+.venv/bin/python -m pip install -r requirements-audio.txt  # + weekly_downloader
+```
+
+`requirements-audio.txt` is split out only because Demucs pulls torch (~2GB).
+The downloader also needs `ffmpeg` and `deno` on PATH, installed outside pip.
+
+### Local Spotify setup (browser available)
 
 1. Create an app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) and select **Web API**.
 2. In the app settings, add this redirect URI exactly: `http://127.0.0.1:8888/callback` (Spotify no longer accepts `localhost` for local callbacks).
 3. Create the local Python environment and install the project dependencies:
 
    ```bash
-   /opt/homebrew/bin/python3.12 -m venv .venv
+   python3 -m venv .venv
    .venv/bin/python -m pip install -r requirements.txt
    ```
 
@@ -67,9 +86,9 @@ Spotify's OAuth flow needs a browser to log in and a reachable redirect URI to r
 3. Run the helper with `--remote`:
 
    ```bash
-   python3 config_helper.py --check-only --remote   # if .env is already filled in
+   .venv/bin/python config_helper.py --check-only --remote   # if .env is already filled in
    # or, to also (re)enter credentials first:
-   python3 config_helper.py --remote
+   .venv/bin/python config_helper.py --remote
    ```
 
    It prints a Spotify login URL — open that in any browser on any device, log in, and approve access. You'll land on the redirect URI with `?code=...` in the address bar (the page content doesn't matter, even an error page is fine). Paste that full URL back into the prompt. The script exchanges the code for a token and caches it to `data/.spotify_cache`.

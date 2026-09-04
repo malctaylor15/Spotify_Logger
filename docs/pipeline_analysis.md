@@ -1,5 +1,14 @@
 # Spotify Logger Pipeline Analysis
 
+> **Superseded — historical reference only.** This analysis describes the repo
+> before the credential and environment realignment. It is wrong about, at
+> least: the credential layout (now `.env` + `data/`, not `../credentials/`
+> pickles), the virtualenv (now the repo-local `.venv` for every job, not
+> `/home/malcolm/main`), the Spotify token cache (now `data/.spotify_cache`
+> everywhere, no `username='malchemist02'`), and the notebook parameters.
+> See [DOCUMENTATION.md](../DOCUMENTATION.md) for the current state. The
+> sections on data flow, the DB schema and the failure modes are still useful.
+
 ## 1. System Overview
 
 ### What the system does

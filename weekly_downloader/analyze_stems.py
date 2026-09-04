@@ -14,6 +14,11 @@ Usage:
     python3 analyze_stems.py --report-only    # write the HTML report, no email
     python3 analyze_stems.py --send           # score and email the results
     python3 analyze_stems.py --keep-stems     # don't delete the WAVs
+    python3 analyze_stems.py --min-tracks 3   # insist on three breakdowns
+
+The report never goes out short: if this week produced fewer than --min-tracks
+analysable songs, the most recent earlier tracks are carried over from the
+library so there is always a full set of breakdowns to read.
 """
 
 import argparse
@@ -291,9 +296,41 @@ def analyse_track(track: Path, workdir: Path, model: str, keep_stems: bool,
             "ranking": [n for n, _ in ranked]}
 
 
+# ----------------------------------------------------------------- top-up ---
+
+def topup_from_library(library, week: str, results: list[dict],
+                       min_tracks: int) -> list[dict]:
+    """Carry earlier weeks' tracks in until there are `min_tracks` breakdowns.
+
+    A week where YouTube blocked most downloads should still produce a usable
+    email, so the shortfall is filled from the newest stored analyses rather
+    than sending a one-track report (or none at all).
+    """
+    if len(results) >= min_tracks:
+        return []
+
+    have = {r["track"] for r in results}
+    carried: list[dict] = []
+    for past in library_db.available_weeks(library):
+        if past == week:
+            continue
+        for res in library_db.load_week_results(library, past):
+            if res["track"] in have:
+                continue
+            res["carried_from"] = past
+            carried.append(res)
+            have.add(res["track"])
+            if len(results) + len(carried) >= min_tracks:
+                return carried
+    return carried
+
+
 # ----------------------------------------------------------------- report ---
 
 def build_html(results: list[dict], week: str) -> str:
+    n_carried = sum(1 for r in results if r.get("carried_from"))
+    carried_note = (f", plus {n_carried} carried over from earlier weeks"
+                    if n_carried else "")
     rows = []
     for res in results:
         top = res["ranking"][0]
@@ -304,9 +341,12 @@ def build_html(results: list[dict], week: str) -> str:
             f"<td style='padding:4px 12px 4px 0'>{m['rms_db']:.1f} dB</td>"
             f"<td style='padding:4px 0;color:#555'>{describe(n, m)}</td></tr>"
             for i, (n, m) in enumerate(res["stems"].items(), 1))
+        origin = (f" <span style='color:#888;font-size:13px;font-weight:normal'>"
+                  f"&mdash; carried over from week of {res['carried_from']}"
+                  f"</span>" if res.get("carried_from") else "")
         rows.append(f"""
         <div style="margin:0 0 28px 0">
-          <h3 style="margin:0 0 2px 0">{res['track']}</h3>
+          <h3 style="margin:0 0 2px 0">{res['track']}{origin}</h3>
           <p style="margin:0 0 8px 0;color:#444">
             Most interesting stem: <b>{top}</b> (score {top_m['score']}) &mdash;
             {describe(top, top_m)}
@@ -323,8 +363,8 @@ def build_html(results: list[dict], week: str) -> str:
         max-width:760px;color:#111">
       <h2 style="margin-bottom:4px">Weekly stem recommendations</h2>
       <p style="margin-top:0;color:#666">
-        Week of {week} &middot; {len(results)} track(s) analysed locally with Demucs
-        ({DEMUCS_MODEL}).</p>
+        Week of {week} &middot; {sum(1 for r in results if not r.get("carried_from"))}
+        new track(s) analysed locally with Demucs ({DEMUCS_MODEL}){carried_note}.</p>
       <p style="color:#444">Scores are relative <em>within</em> each song: they blend
         loudness, spectral variation, dynamic range, entropy and how much of the
         track the stem plays on. Upload the highlighted tracks to Moises to work
@@ -339,7 +379,9 @@ def build_text(results: list[dict], week: str) -> str:
     lines = [f"Weekly stem recommendations - week of {week}", ""]
     for res in results:
         top = res["ranking"][0]
-        lines.append(f"{res['track']}")
+        origin = (f"   (carried over from week of {res['carried_from']})"
+                  if res.get("carried_from") else "")
+        lines.append(f"{res['track']}{origin}")
         lines.append(f"  -> most interesting: {top} "
                      f"({res['stems'][top]['score']}) - "
                      f"{describe(top, res['stems'][top])}")
@@ -404,6 +446,11 @@ def main() -> int:
     parser.add_argument("--folder", type=Path, help="Week folder (default: newest)")
     parser.add_argument("--model", default=DEMUCS_MODEL, help="Demucs model name")
     parser.add_argument("--limit", type=int, help="Only analyse the first N tracks")
+    parser.add_argument("--min-tracks", type=int, default=2,
+                        help="Always report on at least this many tracks "
+                             "(default: 2). Any shortfall this week is filled "
+                             "with the most recent earlier tracks from the "
+                             "library, clearly labelled. 0 disables it.")
     parser.add_argument("--keep-stems", action="store_true",
                         help="Keep the stem WAVs instead of deleting them")
     parser.add_argument("--dry-run", action="store_true",
@@ -437,6 +484,7 @@ def main() -> int:
             print(f"No stored analysis for week {week}. "
                   f"Available: {', '.join(weeks)}", file=sys.stderr)
             return 1
+        results += topup_from_library(library, week, results, args.min_tracks)
         print(f"Rebuilt {len(results)} track(s) for week {week} from the library.")
         print("\n" + build_text(results, week))
         REPORTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -458,8 +506,13 @@ def main() -> int:
     if args.limit:
         tracks = tracks[:args.limit]
     if not tracks:
+        # A week where every download failed still deserves an email, so fall
+        # through to the library top-up instead of exiting quietly.
         print(f"No mp3 files in {folder}")
-        return 0
+        if args.min_tracks <= 0:
+            return 0
+        print(f"Falling back to the {args.min_tracks} most recent analysed "
+              f"track(s) so the report still goes out.")
 
     print(f"{len(tracks)} track(s) in {folder.name}:")
     for t in tracks:
@@ -482,6 +535,14 @@ def main() -> int:
                                 force=args.reanalyse)
             if res:
                 results.append(res)
+
+    carried = topup_from_library(library, week, results, args.min_tracks)
+    if carried:
+        print(f"\nOnly {len(results)} track(s) analysable this week; carrying "
+              f"{len(carried)} earlier track(s) into the report:")
+        for res in carried:
+            print(f"  - {res['track']} (week of {res['carried_from']})")
+        results += carried
 
     if not results:
         print("\nNo tracks could be analysed.", file=sys.stderr)

@@ -10,10 +10,14 @@ mp3 into a dated weekly folder.
 This folder lives inside the Spotify_Logger repo but is self-contained: it only
 *reads* the repo's database and writes exclusively under weekly_downloader/.
 
+`--top` is a target, not a slice: the chart is walked in rank order until that
+many songs are actually sitting in this week's folder, so a #1 that YouTube
+refuses is replaced by #11 rather than silently lost.
+
 Usage:
-    python3 download_weekly.py               # query + download top 10
+    python3 download_weekly.py               # keep going until 10 songs land
     python3 download_weekly.py --dry-run     # show what would be downloaded
-    python3 download_weekly.py --top 5 --days 14
+    python3 download_weekly.py --top 2 --days 14
 """
 
 import argparse
@@ -30,6 +34,13 @@ HERE = Path(__file__).resolve().parent          # .../Spotify_Logger/weekly_down
 REPO_ROOT = HERE.parent                          # .../Spotify_Logger
 DEFAULT_DB = REPO_ROOT / "data" / "listening_history.db"
 DOWNLOADS_DIR = HERE / "downloads"
+
+# Prefer the yt-dlp installed next to this interpreter (e.g. .venv/bin/yt-dlp)
+# over whatever a bare "yt-dlp" PATH lookup would find. A plain PATH lookup
+# can silently resolve to yt-dlp in a different environment - one without
+# plugins (like a PO Token provider) that were only installed here.
+_sibling_ytdlp = Path(sys.executable).parent / "yt-dlp"
+YT_DLP = str(_sibling_ytdlp) if _sibling_ytdlp.exists() else "yt-dlp"
 
 # Healing-music playlist to exclude (Sat-Chit meditation tracks, etc.)
 EXCLUDED_PLAYLIST_IDS = [
@@ -91,7 +102,7 @@ JS_RUNTIMES = [
 def ytdlp_version() -> str | None:
     """Return the installed yt-dlp version string, or None if unavailable."""
     try:
-        out = subprocess.run(["yt-dlp", "--version"],
+        out = subprocess.run([YT_DLP, "--version"],
                              capture_output=True, text=True, timeout=30)
         return out.stdout.strip() or None
     except Exception:
@@ -123,7 +134,7 @@ def find_js_runtime() -> tuple[str, str | None] | None:
 def ytdlp_debug_header() -> str:
     """Return yt-dlp's own --verbose debug header (works offline, no URL)."""
     try:
-        out = subprocess.run(["yt-dlp", "-v", "--no-update"],
+        out = subprocess.run([YT_DLP, "-v", "--no-update"],
                              capture_output=True, text=True, timeout=60)
         return (out.stderr or "") + (out.stdout or "")
     except Exception:
@@ -137,7 +148,7 @@ def ytdlp_interpreter() -> str:
     interpreter than the one running this script (conda env vs system vs
     Homebrew). Installing yt-dlp-ejs into the wrong one changes nothing.
     """
-    exe = shutil.which("yt-dlp")
+    exe = shutil.which(YT_DLP)
     if exe:
         try:
             with open(exe, "r", errors="ignore") as fh:
@@ -289,7 +300,7 @@ def download_song(name: str, artist: str, week_dir: Path, archive: Path,
 
     for attempt, client in enumerate(clients):
         cmd = [
-            "yt-dlp",
+            YT_DLP,
             f"ytsearch1:{query}",
             "--extract-audio",
             "--audio-format", "mp3",
@@ -334,7 +345,15 @@ def main() -> int:
     parser.add_argument("--db", type=Path, default=DEFAULT_DB,
                         help=f"Path to listening_history.db (default: {DEFAULT_DB})")
     parser.add_argument("--top", type=int, default=10,
-                        help="How many songs to download (default: 10)")
+                        help="How many songs to end up with this week "
+                             "(default: 10). This is a target, not a slice: "
+                             "the chart is walked in rank order until this "
+                             "many mp3s have landed, so a failed #1 is "
+                             "replaced by #11 rather than lost.")
+    parser.add_argument("--max-candidates", type=int, default=None,
+                        help="How far down the chart to walk while trying to "
+                             "reach --top (default: 4x --top). Bounds the work "
+                             "when YouTube is failing on most songs.")
     parser.add_argument("--days", type=int, default=7,
                         help="Look-back window in days (default: 7)")
     parser.add_argument("--dry-run", action="store_true",
@@ -356,6 +375,17 @@ def main() -> int:
                              f"(default: {library_db.DEFAULT_DB})")
     parser.add_argument("--redownload", action="store_true",
                         help="Ignore the library and re-download everything")
+    parser.add_argument("--proxy", metavar="URL",
+                        help="Route yt-dlp through a proxy (e.g. "
+                             "socks5://127.0.0.1:1080). The bot check is IP "
+                             "reputation based, so a cleaner exit IP can clear "
+                             "it without any account or cookies.")
+    parser.add_argument("--cookies", metavar="FILE", type=Path,
+                        help="Netscape-format cookies file to hand yt-dlp. On "
+                             "a headless box this is the only way past "
+                             "YouTube's 'Sign in to confirm you're not a bot' "
+                             "check. Note: using your account carries a ban "
+                             "risk.")
     parser.add_argument("--cookies-from-browser", metavar="BROWSER",
                         help="Pass browser cookies to yt-dlp (e.g. safari, "
                              "chrome, firefox). Enables the 'tv' client and "
@@ -364,7 +394,7 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.doctor:
-        if shutil.which("yt-dlp") is None:
+        if shutil.which(YT_DLP) is None:
             print("yt-dlp: NOT FOUND on PATH", file=sys.stderr)
             return 1
         version = ytdlp_version()
@@ -378,13 +408,15 @@ def main() -> int:
         print(f"ERROR: database not found at {args.db}", file=sys.stderr)
         return 1
 
-    songs = get_top_songs(args.db, args.top, args.days)
+    max_candidates = args.max_candidates or args.top * 4
+    songs = get_top_songs(args.db, max_candidates, args.days)
     if not songs:
         print(f"No plays found in the last {args.days} days.")
         return 0
 
     print(f"Top {len(songs)} songs from the last {args.days} days "
-          f"(healing-music playlist excluded):\n")
+          f"(healing-music playlist excluded). Want {args.top}, walking down "
+          f"the list until that many land:\n")
     for i, (name, artist, plays, minutes) in enumerate(songs, 1):
         print(f"  {i:2d}. {artist} - {name}   ({plays} plays, {minutes} min)")
     print()
@@ -393,7 +425,7 @@ def main() -> int:
         print("Dry run: nothing downloaded.")
         return 0
 
-    if shutil.which("yt-dlp") is None:
+    if shutil.which(YT_DLP) is None:
         print("ERROR: yt-dlp not found on PATH. Install it or add it to PATH.",
               file=sys.stderr)
         return 1
@@ -404,6 +436,16 @@ def main() -> int:
     warn_if_stale(ytdlp_version())
 
     ok, extra_args = preflight(args.remote_ejs)
+    if args.proxy:
+        extra_args += ["--proxy", args.proxy]
+        print(f"Proxy: {args.proxy}")
+    if args.cookies:
+        if not args.cookies.exists():
+            print(f"ERROR: cookies file not found at {args.cookies}",
+                  file=sys.stderr)
+            return 1
+        extra_args += ["--cookies", str(args.cookies)]
+        print(f"Cookies: from {args.cookies}")
     if args.cookies_from_browser:
         extra_args += ["--cookies-from-browser", args.cookies_from_browser]
         print(f"Cookies: from {args.cookies_from_browser}")
@@ -423,42 +465,60 @@ def main() -> int:
     week_of = week_start.isoformat()
 
     failures, skipped, fetched = [], [], []
+    secured = 0          # songs whose mp3 is actually in THIS week's folder
+    walked = 0           # how far down the chart we got
     for i, (name, artist, plays, minutes) in enumerate(songs, 1):
-        print(f"[{i}/{len(songs)}] {artist} - {name}")
+        if secured >= args.top:
+            break
+        walked = i
+        print(f"[#{i}] {artist} - {name}   ({plays} plays, {minutes} min)")
 
         if not args.redownload:
             seen, reason = library_db.already_downloaded(library, name, artist,
                                                          DOWNLOADS_DIR)
             if seen:
                 print(f"     skip - {reason}")
-                skipped.append(f"{artist} - {name}")
+                skipped.append(f"#{i} {artist} - {name}")
                 # Keep the ranking fresh even when the audio is reused.
                 library_db.record_download(
                     library, name=name, artist=artist, week_of=week_of,
                     plays=plays, minutes=minutes)
+                # Only audio sitting in this week's folder feeds this week's
+                # analysis. A copy left over from an earlier week was already
+                # reported on, so it does not fill a slot - keep walking.
+                on_disk = library_db.find_on_disk(name, artist, DOWNLOADS_DIR)
+                if on_disk and on_disk.parent == week_dir:
+                    secured += 1
                 continue
             if reason:
                 print(f"     {reason}")
 
         ok, video_id, client_used = download_song(
             name, artist, week_dir, archive, extra_args, clients)
-        if ok:
-            expected = week_dir / f"{library_db.safe_filename(name, artist)}.mp3"
+        expected = week_dir / f"{library_db.safe_filename(name, artist)}.mp3"
+        # yt-dlp exits 0 when the download archive already lists the video it
+        # picked, leaving no file behind. Only a real mp3 counts as secured.
+        if ok and expected.exists():
             library_db.record_download(
                 library, name=name, artist=artist, week_of=week_of,
-                file_path=expected if expected.exists() else None,
+                file_path=expected,
                 youtube_id=video_id, player_client=client_used or "default",
                 plays=plays, minutes=minutes, status="downloaded")
-            fetched.append(f"{artist} - {name}")
+            fetched.append(f"#{i} {artist} - {name}")
+            secured += 1
         else:
+            if ok:
+                print(f"     yt-dlp reported success but no mp3 landed in "
+                      f"{week_dir.name} - counting it as a miss")
             library_db.record_download(
                 library, name=name, artist=artist, week_of=week_of,
                 plays=plays, minutes=minutes, status="failed")
-            failures.append(f"{artist} - {name}")
+            failures.append(f"#{i} {artist} - {name}")
 
     print(f"\nDone. Files are in: {week_dir}")
-    print(f"  downloaded: {len(fetched)}   skipped (already had): "
-          f"{len(skipped)}   failed: {len(failures)}")
+    print(f"  secured: {secured}/{args.top}   downloaded: {len(fetched)}   "
+          f"skipped (already had): {len(skipped)}   failed: {len(failures)}")
+    print(f"  walked chart positions 1-{walked} of {len(songs)} candidate(s)")
     stats = library_db.summary(library)
     print(f"  library: {stats['downloads']} songs across {stats['weeks']} week(s), "
           f"{stats['analysed']} analysed")
@@ -467,6 +527,13 @@ def main() -> int:
         print("Failed to download:")
         for f in failures:
             print(f"  - {f}")
+
+    if secured < args.top:
+        print(f"\nWARNING: only {secured} of the {args.top} song(s) asked for "
+              f"landed in {week_dir.name}, after exhausting all "
+              f"{len(songs)} candidate(s). Raise --max-candidates, or read "
+              f"weekly_downloader/WORKING_SETUP.md if every download failed.",
+              file=sys.stderr)
         return 1
     return 0
 
