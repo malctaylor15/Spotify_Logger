@@ -1,4 +1,25 @@
-# Weekly Downloader
+# Weekly Uploaded-Music Processor
+
+## Current scheduled workflow
+
+The scheduled workflow does **not** run yt-dlp on this machine. Audio is
+downloaded elsewhere and uploaded to `downloads/week_of_YYYY-MM-DD/`. Every
+day, `weekly_upload_job.py` checks the latest completed Sunday-Saturday week's
+top eight songs, lists missing files, analyzes uploaded top-eight files with
+Demucs, and creates an email/report with listening statistics, popularity,
+chart bars, and stem-score diagrams.
+
+```bash
+# Normal daily check (latest completed week)
+python3 weekly_downloader/weekly_upload_job.py --send
+
+# Rebuild a specific week without sending email
+python3 weekly_downloader/weekly_upload_job.py --week-of 2026-10-25 --report-only
+```
+
+Numbered filenames such as `01 - Adele - Love In The Dark.mp3` are supported.
+The yt-dlp documentation below describes the retained manual downloader; it is
+no longer invoked by `run_weekly_stems.sh` or cron.
 
 > **Working as of 2026-08-19.** See [WORKING_SETUP.md](WORKING_SETUP.md) for the
 > verified configuration, what a healthy run looks like, and how to diagnose the
@@ -357,4 +378,72 @@ To run automatically every Sunday at 9am, add to `crontab -e`:
 
 ```
 0 9 * * 0 cd /Users/malcolmtaylor/python_related/Spotify_Logger && /usr/bin/python3 weekly_downloader/download_weekly.py >> weekly_downloader/downloads/weekly_download.log 2>&1
+```
+
+### Listening profile in the uploaded-music email
+
+`weekly_upload_job.py` includes a listening profile in both HTML and plain text.
+It summarizes the selected top songs, not the entire listening library:
+
+- Artist genres ranked by plays, with unknown coverage and overlapping tags disclosed.
+- Play-weighted vocal activity and vocals/bass/drums/other energy shares, calculated
+  from raw RMS measurements (`10 ** (rms_db / 10)`), excluding silent stems.
+- The most vocal-forward, most bass-heavy, and most replayed analyzed songs.
+- The closest pair by squared distance across four energy shares and vocal activity.
+
+The report gives analyzed-song and play coverage. Missing audio is excluded from
+sound averages rather than treated as silence. Repeat plays and listening days
+are preference signals; energy shares describe separated stems rather than exact
+mix proportions. Similarity describes arrangement balance, not voice type,
+lyrics, melody, or vocal timbre. Existing stem-interest bars remain separate.
+
+### Lyrics and themes pilot
+
+The uploaded-music email also includes **Stories and themes in your top songs**.
+It uses all chart entries, whether or not audio was uploaded. Reviewed
+interpretations and source metadata live in the gitignored
+`data/lyrics_analysis.json`; generated HTML, plain text, and JSON reports include
+only derived summaries, tags, and provenance, never the full lyrics.
+
+The reusable analysis prompt and cache contract are in
+[LYRICS_PROMPT.md](LYRICS_PROMPT.md). This first version uses manually reviewed
+free sources: the reporting job performs no lyrics scraping, LLM requests, or
+paid API calls. New songs without a reviewed cache entry display an explicit
+unavailable status, so another week's report cannot silently reuse a similarly
+named cover, remix, or mashup.
+
+Preview the pilot without email or new audio separation:
+
+```bash
+.venv/bin/python weekly_downloader/weekly_upload_job.py \
+  --week-of 2026-11-01 --report-only --skip-audio
+```
+
+`--lyrics-cache PATH` selects a different reviewed cache. `--skip-audio` reuses
+stored stem analyses if present. `--report-only` suppresses sending even if
+`--send` is also provided. Preview files are
+`weekly_downloader/reports/weekly_uploads_<week>.{html,txt,json}`.
+
+Fully analyzed entries require verified version identity, a complete inspected
+lyrics source, the current prompt version, and a 40–60 word interpretation.
+Partial interpretations remain visible with limitations but are excluded from
+weekly comparisons and theme percentages, as are unverified, unavailable, and
+instrumental entries. Tags are deduplicated per song, then weighted by plays;
+the denominator is plays for fully analyzed songs. Percentages overlap.
+
+A reviewed weekly comparison is tied to the exact analysis signature. Without
+one, the renderer identifies shared tags with supporting song names or reports
+no strong shared theme. Coverage is always recalculated from the current chart.
+Malformed caches or invalid individual entries do not stop the email.
+
+The November 1–7 pilot has five fully analyzed songs (15/23 plays), one limited
+interpretation, and two unverified versions. Review notes and source constraints
+are in the generated `reports/lyrics_pilot_2026-11-01.md`. Free-source coverage
+is useful but incomplete; a reliable automated source remains a separate
+follow-up after assessing access and permitted use. No paid service was chosen.
+
+Run the regression checks with:
+
+```bash
+.venv/bin/python weekly_downloader/test_lyrics_analysis.py
 ```

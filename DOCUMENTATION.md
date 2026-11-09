@@ -16,10 +16,10 @@ metadata. Over time this builds the complete listening history Spotify won't
 give you. A weekly/monthly job reads that history and emails an analysis
 report.
 
-**2. Weekly downloader (`weekly_downloader/`).** Reads the same database,
-finds the week's most-played songs, downloads each from YouTube as mp3,
-optionally separates them into stems locally with Demucs, and emails a
-recommendation of which stems are worth exploring.
+**2. Weekly uploaded-music processor (`weekly_downloader/`).** Reads the same
+database, finds the completed week's eight most-played songs, checks for audio
+uploaded by another machine, separates available tracks into stems locally
+with Demucs, and emails the chart, missing-file list, and analysis.
 
 ```
 Spotify Web API
@@ -30,8 +30,8 @@ Artists_Info        │
 (data/listening_history.db)
                     │
                     └──► weekly_downloader/
-                            download_weekly.py  ──► top-N mp3s
-                            analyze_stems.py    ──► emailed stem picks
+                            uploaded mp3s       ──► daily inventory
+                            weekly_upload_job.py ─► chart + emailed analysis
 ```
 
 ---
@@ -74,14 +74,19 @@ missing ones are fetched.
 | **Parameters** | `db_location`, `look_back_days`, `send_email` |
 | **Dry run** | `-p send_email False` builds the report and plots without emailing |
 
-### Weekly downloader — top songs as audio
+### Weekly uploaded-music processor
 
 | | |
 |---|---|
-| **Entry point** | `bash run_weekly_stems.sh`, or `.venv/bin/python weekly_downloader/download_weekly.py` |
-| **Does** | Ranks the top N songs of the last 7 days, excluding the healing-music playlist, and fetches each from YouTube as mp3 |
+| **Entry point** | `bash run_weekly_stems.sh`, or `.venv/bin/python weekly_downloader/weekly_upload_job.py` |
+| **Does** | Ranks the top 8 songs in the latest completed Sunday-Saturday week, excluding the healing-music playlist; inventories externally uploaded mp3s; analyzes available top-8 tracks; reports missing songs and listening context |
 | **Writes** | `weekly_downloader/downloads/week_of_<date>/` (gitignored) |
-| **Health check** | `--doctor` verifies yt-dlp, JS runtime, EJS solver, ffmpeg |
+| **Past week** | Use `--week-of YYYY-MM-DD` to process a specific Sunday, for example `--week-of 2026-10-25` |
+
+`yt-dlp` is no longer called by the scheduled job. Another machine places
+files in the dated folder; leading chart numbers such as `01 - Artist - Song`
+are accepted. The legacy `download_weekly.py` remains available for manual use
+but is not part of automation.
 
 ### Stem analysis — which parts of a song are interesting
 
@@ -207,7 +212,7 @@ re-running a report refreshes its rows instead of appending duplicates.
 | Ingestion | Every 2 hours | `bash run_notebook.sh` |
 | Weekly report | Sundays | `bash run_email_notebook.sh` |
 | Monthly report | Monthly | `bash run_analysis_monthly.sh` |
-| Weekly download + stems | Sundays | `bash run_weekly_stems.sh` |
+| Weekly upload check + stems | Daily at 4:15 AM | `bash run_weekly_stems.sh` |
 
 Every script activates the repo-local `.venv` and exits with the papermill
 status, so cron sees failures. Each has its crontab line in a trailing comment.

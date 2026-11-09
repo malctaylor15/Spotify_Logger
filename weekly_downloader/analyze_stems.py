@@ -24,6 +24,7 @@ library so there is always a full set of breakdowns to read.
 import argparse
 import json
 import math
+import re
 import shutil
 import smtplib
 import ssl
@@ -239,6 +240,11 @@ def run_demucs(track: Path, out_dir: Path, model: str = DEMUCS_MODEL) -> Path | 
 
 def split_title(stem_name: str) -> tuple[str, str]:
     """Recover (artist, title) from an 'Artist - Title' filename."""
+    # Files supplied by the other download machine are often numbered to
+    # preserve chart order ("01 - Artist - Title.mp3").  The number is not
+    # part of the artist identity and would otherwise prevent matching the
+    # file to Spotify/library metadata.
+    stem_name = re.sub(r"^\s*\d+\s*-\s*", "", stem_name)
     if " - " in stem_name:
         artist, title = stem_name.split(" - ", 1)
         return artist.strip(), title.strip()
@@ -251,14 +257,20 @@ def analyse_track(track: Path, workdir: Path, model: str, keep_stems: bool,
     """Separate and score one track, reusing stored results when available."""
     print(f"\n=== {track.name} ===")
     artist, title = split_title(track.stem)
+    display_track = f"{artist} - {title}" if artist else title
 
     if library is not None and not force:
         row = library_db.get_download(library, title, artist)
         if row and library_db.is_analysed(library, int(row["id"])):
             print("  already analysed - reusing stored metrics")
-            for cached in library_db.load_week_results(library, row["week_of"]):
-                if cached["track"] == track.stem:
-                    return cached
+            # A song has one download row but may be selected again in a later
+            # week.  Older downloader runs did not update downloads.week_of on
+            # conflict, so look through stored analysis weeks rather than
+            # assuming the download row's week points at the metrics.
+            for cached_week in library_db.available_weeks(library):
+                for cached in library_db.load_week_results(library, cached_week):
+                    if cached["track"] == display_track:
+                        return cached
 
     print("  separating (this takes a few minutes per track) ...")
     stem_dir = run_demucs(track, workdir, model)
@@ -292,7 +304,7 @@ def analyse_track(track: Path, workdir: Path, model: str, keep_stems: bool,
             week_of=week_of or "unknown", model=model,
             ranked_stems=ranked, describe=describe)
 
-    return {"track": track.stem, "stems": dict(ranked),
+    return {"track": display_track, "stems": dict(ranked),
             "ranking": [n for n, _ in ranked]}
 
 
